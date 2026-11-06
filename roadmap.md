@@ -11,3 +11,8 @@ Brief: keep green/gold theme + structure; real backend (no mock data); roles Adm
 7. [ ] Wire public pages to DB (home, services, announcements, court schedule) + "Temporarily unavailable" toggles
 8. [ ] Design polish pass (spacing, buttons, forms, tables, mobile)
 9. [ ] Tests for rules that matter (double-booking prevention, roles) + end-to-end verify in preview
+
+## Court booking upgrade
+- [x] Availability calendar (date + time) for guests, residents, admin
+- [x] Booking history (resident) with delete
+- [x] Admin CRUD (create/edit date, time, status/delete), tables, status tabs with paging, purge old history

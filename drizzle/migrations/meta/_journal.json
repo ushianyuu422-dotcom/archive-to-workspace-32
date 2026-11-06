@@ -8,6 +8,13 @@
       "when": 1793980844717,
       "tag": "0000_wawa_full_backend_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793981562125,
+      "tag": "0001_court_booking_improvements",
+      "breakpoints": true
     }
   ]
 }

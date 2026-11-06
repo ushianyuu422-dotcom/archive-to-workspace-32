@@ -109,25 +109,190 @@ export const cancelMyReservation = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+export const updateMyReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => reservationSchema.extend({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    if (!isValidSlot(data.slot)) throw new Error("Choose one of the daily time slots.");
+    const today = new Date().toISOString().slice(0, 10);
+    if (data.res_date < today) throw new Error("Pick today or a future date.");
+    const { data: row } = await context.supabase
+      .from("court_reservations")
+      .select("id, res_date, slot, status")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!row) throw new Error("Reservation not found.");
+    if (row.status !== "pending") throw new Error("Only pending reservations can be edited.");
+    if (row.res_date !== data.res_date || row.slot !== data.slot) {
+      const { data: status } = await context.supabase.rpc("court_slot_status", {
+        p_date: data.res_date,
+        p_slot: data.slot,
+      });
+      if (status === "blocked") throw new Error("That slot is closed for a barangay activity.");
+      if (status !== "open") throw new Error("That slot is already reserved. Pick another.");
+    }
+    const { error } = await context.supabase
+      .from("court_reservations")
+      .update({
+        res_date: data.res_date,
+        slot: data.slot,
+        purpose: data.purpose,
+        contact_number: data.contact_number,
+      })
+      .eq("id", data.id);
+    if (error) {
+      if (error.code === "23505") throw new Error("That slot was just reserved. Pick another.");
+      throw new Error(error.message);
+    }
+    return { ok: true as const };
+  });
+
+export const deleteMyReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("court_reservations")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .in("status", ["cancelled", "rejected", "completed"])
+      .select("id");
+    if (error) throw new Error(error.message);
+    if (!rows?.length) throw new Error("Only finished bookings can be removed from history.");
+    return { ok: true as const };
+  });
+
 export const adminListReservations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
     z
-      .object({ status: z.string().optional(), from: dateString.optional(), to: dateString.optional() })
-      .parse(data),
+      .object({
+        status: z.enum(["pending", "approved", "rejected", "cancelled", "completed"]).optional(),
+        from: dateString.optional(),
+        to: dateString.optional(),
+        page: z.number().int().min(1).default(1),
+        pageSize: z.number().int().min(5).max(100).default(10),
+      })
+      .parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     let query = context.supabase
       .from("court_reservations")
-      .select("*, resident:profiles(first_name, middle_name, last_name, email)")
-      .order("res_date", { ascending: false });
-    if (data.status) query = query.eq("status", data.status as "pending");
+      .select("*, resident:profiles(first_name, middle_name, last_name, email)", { count: "exact" })
+      .order("res_date", { ascending: false })
+      .order("slot", { ascending: true });
+    if (data.status) query = query.eq("status", data.status);
     if (data.from) query = query.gte("res_date", data.from);
     if (data.to) query = query.lte("res_date", data.to);
-    const { data: rows, error } = await query;
+    const start = (data.page - 1) * data.pageSize;
+    const { data: rows, error, count } = await query.range(start, start + data.pageSize - 1);
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    return { rows: rows ?? [], total: count ?? 0 };
+  });
+
+export const adminStatusCounts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const statuses = ["pending", "approved", "rejected", "cancelled", "completed"] as const;
+    const out: Record<string, number> = {};
+    await Promise.all(
+      statuses.map(async (st) => {
+        const { count } = await context.supabase
+          .from("court_reservations")
+          .select("id", { count: "exact", head: true })
+          .eq("status", st);
+        out[st] = count ?? 0;
+      }),
+    );
+    return out;
+  });
+
+export const adminCreateReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    reservationSchema
+      .extend({
+        email: z.string().trim().email("Enter the resident's account email."),
+        status: z.enum(["pending", "approved"]).default("approved"),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    if (!isValidSlot(data.slot)) throw new Error("Choose one of the daily time slots.");
+    const { data: resident } = await context.supabase
+      .from("profiles")
+      .select("id")
+      .ilike("email", data.email)
+      .maybeSingle();
+    if (!resident) throw new Error("No resident account uses that email.");
+    const { data: status } = await context.supabase.rpc("court_slot_status", {
+      p_date: data.res_date,
+      p_slot: data.slot,
+    });
+    if (status === "blocked") throw new Error("That slot is blocked for a barangay activity.");
+    if (status === "taken" || status === "mine") throw new Error("That slot is already reserved.");
+    const { error } = await context.supabase.from("court_reservations").insert({
+      user_id: resident.id,
+      res_date: data.res_date,
+      slot: data.slot,
+      purpose: data.purpose,
+      contact_number: data.contact_number,
+      status: data.status,
+    });
+    if (error) {
+      if (error.code === "23505") throw new Error("That slot is already reserved.");
+      throw new Error(error.message);
+    }
+    await notify(
+      context.supabase,
+      resident.id,
+      "Court reservation added",
+      `The barangay booked the court for you on ${data.res_date} (${data.slot}).`,
+      "/court-booking",
+    );
+    return { ok: true as const };
+  });
+
+export const adminDeleteReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("court_reservations").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+/** Data disposition: permanently delete finished bookings dated before a cut-off. */
+export const adminPurgeReservations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        before: dateString,
+        statuses: z
+          .array(z.enum(["rejected", "cancelled", "completed"]))
+          .min(1, "Pick at least one status to purge."),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const today = new Date().toISOString().slice(0, 10);
+    if (data.before > today) throw new Error("The cut-off date cannot be in the future.");
+    const { data: rows, error } = await context.supabase
+      .from("court_reservations")
+      .delete()
+      .lt("res_date", data.before)
+      .in("status", data.statuses)
+      .select("id");
+    if (error) throw new Error(error.message);
+    return { deleted: rows?.length ?? 0 };
   });
 
 export const adminUpdateReservation = createServerFn({ method: "POST" })

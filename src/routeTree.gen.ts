@@ -21,6 +21,7 @@ import { Route as PwdRouteImport } from './routes/pwd'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as AdminCourtRouteImport } from './routes/admin.court'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const TrackRoute = TrackRouteImport.update({
   path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCourtRoute = AdminCourtRouteImport.update({
+  id: '/admin/court',
+  path: '/admin/court',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
+  '/admin/court': typeof AdminCourtRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
+  '/admin/court': typeof AdminCourtRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
+  '/admin/court': typeof AdminCourtRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/terms'
     | '/track'
+    | '/admin/court'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/terms'
     | '/track'
+    | '/admin/court'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/terms'
     | '/track'
+    | '/admin/court'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   TermsRoute: typeof TermsRoute
   TrackRoute: typeof TrackRoute
+  AdminCourtRoute: typeof AdminCourtRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/court': {
+      id: '/admin/court'
+      path: '/admin/court'
+      fullPath: '/admin/court'
+      preLoaderRoute: typeof AdminCourtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   TermsRoute: TermsRoute,
   TrackRoute: TrackRoute,
+  AdminCourtRoute: AdminCourtRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

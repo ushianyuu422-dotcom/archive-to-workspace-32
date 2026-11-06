@@ -524,6 +524,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      court_availability: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          d: string
+          slot: string
+          status: string
+        }[]
+      }
       court_slot_status: {
         Args: { p_date: string; p_slot: string }
         Returns: string
