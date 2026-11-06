@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AnnouncementsRouteImport } from './routes/announcements'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CourtBookingRouteImport } from './routes/court-booking'
+import { Route as OfficialsRouteImport } from './routes/officials'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PwdRouteImport } from './routes/pwd'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TrackRouteImport } from './routes/track'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnouncementsRoute = AnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourtBookingRoute = CourtBookingRouteImport.update({
+  id: '/court-booking',
+  path: '/court-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficialsRoute = OfficialsRouteImport.update({
+  id: '/officials',
+  path: '/officials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PwdRoute = PwdRouteImport.update({
+  id: '/pwd',
+  path: '/pwd',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/court-booking': typeof CourtBookingRoute
+  '/officials': typeof OfficialsRoute
+  '/privacy': typeof PrivacyRoute
+  '/pwd': typeof PwdRoute
+  '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/track': typeof TrackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/court-booking': typeof CourtBookingRoute
+  '/officials': typeof OfficialsRoute
+  '/privacy': typeof PrivacyRoute
+  '/pwd': typeof PwdRoute
+  '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/track': typeof TrackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/court-booking': typeof CourtBookingRoute
+  '/officials': typeof OfficialsRoute
+  '/privacy': typeof PrivacyRoute
+  '/pwd': typeof PwdRoute
+  '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/track': typeof TrackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/announcements'
+    | '/auth'
+    | '/contact'
+    | '/court-booking'
+    | '/officials'
+    | '/privacy'
+    | '/pwd'
+    | '/services'
+    | '/terms'
+    | '/track'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/account'
+    | '/announcements'
+    | '/auth'
+    | '/contact'
+    | '/court-booking'
+    | '/officials'
+    | '/privacy'
+    | '/pwd'
+    | '/services'
+    | '/terms'
+    | '/track'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/announcements'
+    | '/auth'
+    | '/contact'
+    | '/court-booking'
+    | '/officials'
+    | '/privacy'
+    | '/pwd'
+    | '/services'
+    | '/terms'
+    | '/track'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  AnnouncementsRoute: typeof AnnouncementsRoute
+  AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
+  CourtBookingRoute: typeof CourtBookingRoute
+  OfficialsRoute: typeof OfficialsRoute
+  PrivacyRoute: typeof PrivacyRoute
+  PwdRoute: typeof PwdRoute
+  ServicesRoute: typeof ServicesRoute
+  TermsRoute: typeof TermsRoute
+  TrackRoute: typeof TrackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/announcements': {
+      id: '/announcements'
+      path: '/announcements'
+      fullPath: '/announcements'
+      preLoaderRoute: typeof AnnouncementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/court-booking': {
+      id: '/court-booking'
+      path: '/court-booking'
+      fullPath: '/court-booking'
+      preLoaderRoute: typeof CourtBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/officials': {
+      id: '/officials'
+      path: '/officials'
+      fullPath: '/officials'
+      preLoaderRoute: typeof OfficialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pwd': {
+      id: '/pwd'
+      path: '/pwd'
+      fullPath: '/pwd'
+      preLoaderRoute: typeof PwdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  AnnouncementsRoute: AnnouncementsRoute,
+  AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
+  CourtBookingRoute: CourtBookingRoute,
+  OfficialsRoute: OfficialsRoute,
+  PrivacyRoute: PrivacyRoute,
+  PwdRoute: PwdRoute,
+  ServicesRoute: ServicesRoute,
+  TermsRoute: TermsRoute,
+  TrackRoute: TrackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
