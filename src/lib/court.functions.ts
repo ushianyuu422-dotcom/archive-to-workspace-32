@@ -5,6 +5,7 @@ import { reservationSchema, dateString } from "@/lib/validation";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { BOOKING_SLOTS } from "@/lib/site";
+import { isSlotPast } from "@/lib/court-time";
 
 type Ctx = { supabase: import("@supabase/supabase-js").SupabaseClient; userId: string };
 
@@ -21,6 +22,10 @@ async function notify(
   link?: string,
 ) {
   await supabase.from("notifications").insert({ user_id: userId, title, body, link: link ?? null });
+}
+
+function assertNotPast(date: string, slot: string) {
+  if (isSlotPast(date, slot)) throw new Error("That time slot has already started or ended. Pick a later slot.");
 }
 
 export function isValidSlot(slot: string): boolean {
@@ -56,6 +61,7 @@ export const createReservation = createServerFn({ method: "POST" })
       throw new Error("Your account must be approved before booking the court.");
     }
     if (!isValidSlot(data.slot)) throw new Error("Choose one of the daily time slots.");
+    assertNotPast(data.res_date, data.slot);
 
     const today = new Date().toISOString().slice(0, 10);
     if (data.res_date < today) throw new Error("Pick today or a future date.");
@@ -114,6 +120,7 @@ export const updateMyReservation = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => reservationSchema.extend({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     if (!isValidSlot(data.slot)) throw new Error("Choose one of the daily time slots.");
+    assertNotPast(data.res_date, data.slot);
     const today = new Date().toISOString().slice(0, 10);
     if (data.res_date < today) throw new Error("Pick today or a future date.");
     const { data: row } = await context.supabase
@@ -224,6 +231,7 @@ export const adminCreateReservation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     if (!isValidSlot(data.slot)) throw new Error("Choose one of the daily time slots.");
+    assertNotPast(data.res_date, data.slot);
     const { data: resident } = await context.supabase
       .from("profiles")
       .select("id")
@@ -333,6 +341,7 @@ export const adminUpdateReservation = createServerFn({ method: "POST" })
     if (data.res_date || data.slot) {
       const newDate = (data.res_date ?? row.res_date) as string;
       const newSlot = (data.slot ?? row.slot) as string;
+      assertNotPast(newDate, newSlot);
       const { data: conflict } = await context.supabase
         .from("court_reservations")
         .select("id")

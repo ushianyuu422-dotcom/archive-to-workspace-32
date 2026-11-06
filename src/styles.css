@@ -259,13 +259,22 @@
   border-color: var(--color-forest-soft);
 }
 
-/* Court availability calendar day states */
-.cal-day-free button { box-shadow: inset 0 -3px 0 var(--forest-soft); }
-.cal-day-partial button { box-shadow: inset 0 -3px 0 var(--gold); }
-.cal-day-full button { box-shadow: inset 0 -3px 0 var(--muted-foreground); }
-.cal-day-closed button { box-shadow: inset 0 -3px 0 var(--destructive); }
-.cal-dot { display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 9999px; }
-.cal-dot.cal-day-free { background: var(--forest-soft); }
-.cal-dot.cal-day-partial { background: var(--gold); }
-.cal-dot.cal-day-full { background: var(--muted-foreground); }
-.cal-dot.cal-day-closed { background: var(--destructive); }
+/* Court availability calendar: minimalist day tiles */
+.cal-tile {
+  aspect-ratio: 1;
+  border-radius: 0.6rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--forest-deep);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.cal-tile:not(:disabled):hover { transform: translateY(-1px); }
+.cal-tile:disabled { cursor: not-allowed; }
+.cal-tile-selected { box-shadow: 0 0 0 2px var(--forest); }
+.cal-tile-today { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.tile-free { background: color-mix(in oklab, var(--forest-soft) 22%, transparent); }
+.tile-partial { background: color-mix(in oklab, var(--gold) 35%, transparent); }
+.tile-full { background: var(--muted); color: var(--muted-foreground); }
+.tile-closed { background: color-mix(in oklab, var(--destructive) 14%, transparent); color: var(--destructive); }
+.tile-past { background: transparent; color: color-mix(in oklab, var(--muted-foreground) 50%, transparent); }
+.cal-swatch { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 0.25rem; }
