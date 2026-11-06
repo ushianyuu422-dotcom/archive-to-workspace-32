@@ -1,10 +1,58 @@
 [
-{"capability":"code","source":"TanStack Start app (Barangay Wawa site)","outcome":"migrate","status":"in_progress","next_action":"copy source"},
-{"capability":"schema","source":"drizzle/migrations SQL (Postgres)","outcome":"migrate","status":"pending","next_action":"apply in Lovable Cloud"},
-{"capability":"records","source":"seed rows in migration; no export attached","outcome":"migrate","status":"pending","next_action":"request CSV/JSON export"},
-{"capability":"auth identities","source":"Cloud auth (email, Google, Lovable)","outcome":"migrate","status":"pending","next_action":"request users export"},
-{"capability":"authorization","source":"user_roles + RLS","outcome":"migrate","status":"pending","next_action":"apply with schema"},
-{"capability":"uploaded file bytes","source":"storage bucket 'uploads'","outcome":"migrate","status":"pending","next_action":"create bucket; files need export"},
-{"capability":"secrets","source":".env (Cloud-managed only)","outcome":"replace","status":"done","next_action":"none"},
-{"capability":"verification","source":"-","outcome":"verify","status":"pending","next_action":"build + route checks"}
+ {
+  "capability": "code",
+  "source": "TanStack Start app (Barangay Wawa site)",
+  "outcome": "migrate",
+  "status": "done",
+  "next_action": "none"
+ },
+ {
+  "capability": "schema",
+  "source": "drizzle/migrations SQL (Postgres)",
+  "outcome": "migrate",
+  "status": "done",
+  "next_action": "none"
+ },
+ {
+  "capability": "records",
+  "source": "seed rows in migration; no export attached",
+  "outcome": "migrate",
+  "status": "pending",
+  "next_action": "request CSV/JSON export"
+ },
+ {
+  "capability": "auth identities",
+  "source": "Cloud auth (email, Google, Lovable)",
+  "outcome": "migrate",
+  "status": "pending",
+  "next_action": "request users export"
+ },
+ {
+  "capability": "authorization",
+  "source": "user_roles + RLS",
+  "outcome": "migrate",
+  "status": "done",
+  "next_action": "none"
+ },
+ {
+  "capability": "uploaded file bytes",
+  "source": "storage bucket 'uploads'",
+  "outcome": "migrate",
+  "status": "pending",
+  "next_action": "bucket created; old files need export"
+ },
+ {
+  "capability": "secrets",
+  "source": ".env (Cloud-managed only)",
+  "outcome": "replace",
+  "status": "done",
+  "next_action": "none"
+ },
+ {
+  "capability": "verification",
+  "source": "-",
+  "outcome": "verify",
+  "status": "partial",
+  "next_action": "public pages verified; signed-in flows need a user"
+ }
 ]
